@@ -4,12 +4,12 @@ This project implements deep learning models (CNN, LSTM, ELM) for seasonal strea
 
 ## Project Structure
 ```
-├───Code/              # Main implementation
-│   ├───Models/        # Model implementations
-│   ├───Plots/         # Visualization code
-│   └───Preprocessing/ # Data preprocessing
-├───Data/              # Input data
-└───Models/            # Trained models
+├───Code/               # Main implementation
+│   ├───Model_training/ # Model implementations
+│   ├───Plotting/       # Visualization code
+│   └───Preprocessing/  # Data preprocessing
+├───Data/               # Input data
+└───Models/             # Trained models
 ```
 
 ## Installation
@@ -25,9 +25,5 @@ cd master-thesis-streamflow-prediction
 
 3. Install the package and dependencies:
 ```bash
-pip install -e .
+pip install .
 ```
-
-## Data Requirements
-
-Data can be found in the "data" Folder
