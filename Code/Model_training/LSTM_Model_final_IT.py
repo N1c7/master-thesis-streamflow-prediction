@@ -1,7 +1,7 @@
 import os
 from project_paths import get_code_dir, get_data_dir, get_models_dir
 
-from dependencies import (
+from Code.dependencies import (
    # Core data science libraries
    np,
    os,

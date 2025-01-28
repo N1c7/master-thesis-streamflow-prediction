@@ -15,6 +15,8 @@ setup(
         'xarray==2023.1.0',
         'geopandas==0.13.2',
         'shapely==2.0.6',
+        'netCDF4==1.6.3',
+        'h5py==3.8.0',  
         
         # Machine Learning packages
         'scikit-learn==1.3.2',
