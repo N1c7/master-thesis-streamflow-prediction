@@ -33,7 +33,7 @@ from sklearn.metrics import (
     r2_score
 )
 
-# Create aliases for sklearn metrics
+# Create aliases for sklearn metrics 
 sklearn_mse = mean_squared_error
 mae = mean_absolute_error
 

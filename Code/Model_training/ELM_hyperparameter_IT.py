@@ -111,7 +111,7 @@ rmse = np.sqrt(mean_squared_error(y_test_denorm, y_pred_denorm))
 print("RMSE: ", rmse)
 
 # Calculate NSE
-nse = 1 - (np.sum((y_test_denorm - y_pred_denorm) ** 2) / np.sum((y_test_denorm - np.mean(y_test_denorm)) ** 2))
+nse = 1 - (np.sum((y_test_denorm - y_pred_denorm) ** 2) / np.sum((y_test_denorm - np.mean(y_test_denorm)) ** 2)) 
 print("NSE: ", nse)
 
 # Plot the actual values vs the predicted values

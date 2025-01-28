@@ -63,7 +63,7 @@ def df_to_X_y(input_features, output_feature, window_size):
 X, y = df_to_X_y(input_features_normalized, output_feature_normalized, window_size)
 
 # Define the model building function with two LSTM layers and gradient clipping
-def build_model(units1, units2, activation, learning_rate, dropout_rate):
+def build_model(units1, units2, activation, learning_rate, dropout_rate): 
     model = Sequential([
         InputLayer(input_shape=(window_size, X.shape[2])),
         LSTM(units=units1, activation=activation, return_sequences=True),

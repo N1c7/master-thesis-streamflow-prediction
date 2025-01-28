@@ -30,7 +30,7 @@ from Code.dependencies import (
     joblib
 )
 
-input_file_path = os.path.join(get_data_dir(), 'Iori', 'Preprocessed_data_GE.nc')
+input_file_path = os.path.join(get_data_dir(), 'Iori', 'Preprocessed_data_GE.nc') 
 ds = xr.open_dataset(input_file_path)
 
 # Select input features and output feature

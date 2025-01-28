@@ -225,4 +225,4 @@ for horizon in forecast_horizons:
         
         print(f"Direct Model - RMSE: {metrics_direct[1]:.2f}, NSE: {metrics_direct[4]:.2f}")
         print(f"Forecast Model - RMSE: {metrics_forecast[1]:.2f}, NSE: {metrics_forecast[4]:.2f}")
-        print(f"Combined Model - RMSE: {metrics_combined[1]:.2f}, NSE: {metrics_combined[4]:.2f}")
+        print(f"Combined Model - RMSE: {metrics_combined[1]:.2f}, NSE: {metrics_combined[4]:.2f}") 

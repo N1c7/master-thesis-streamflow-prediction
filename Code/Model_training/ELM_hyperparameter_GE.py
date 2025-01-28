@@ -12,6 +12,7 @@ from dependencies import (
     # Sklearn components
     train_test_split,
     StandardScaler,
+    TimeSeriesSplit,
     mean_squared_error
 )
 
@@ -115,7 +116,7 @@ nse = 1 - (np.sum((y_test_denorm - y_pred_denorm) ** 2) / np.sum((y_test_denorm 
 print("NSE: ", nse)
 
 # Plot the actual values vs the predicted values
-plt.figure(figsize=(10, 6))
+plt.figure(figsize=(10, 6)) 
 plt.plot(y_test_denorm, label='Actual Values')
 plt.plot(y_pred_denorm, label='Predicted Values')
 plt.title('Actual vs Predicted Values')

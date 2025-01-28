@@ -38,7 +38,7 @@ from dependencies import (
 
 np.random.seed(123)
 tf.random.set_seed(123)
-
+ 
 # Define file paths and model save directory
 input_file_path = os.path.join(get_data_dir(), 'Secchia', 'Preprocessed_data_IT.nc')
 script_dir = os.path.dirname(os.path.abspath(__file__))

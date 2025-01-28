@@ -177,7 +177,7 @@ plt.tight_layout()
 plt.show()
 
 # Print summary of results
-print("\nSummary of Results:")
+print("\nSummary of Results:") 
 print("="*50)
 for horizon in forecast_horizons:
     if horizon in all_results:
