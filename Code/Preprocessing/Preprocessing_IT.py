@@ -14,14 +14,21 @@ The combined dataset is saved as a NetCDF file.
 
 """
 
-import os
-import numpy as np
-import xarray as xr
-import pandas as pd
-import geopandas as gpd
-from shapely.geometry import box
-from scipy.interpolate import UnivariateSpline
-import matplotlib.pyplot as plt
+from dependencies import (
+    # Core data science libraries
+    os,
+    np,
+    xr,
+    pd,
+    gpd,
+    
+    # Geometry and interpolation
+    box,
+    UnivariateSpline,
+    
+    # Visualization
+    plt
+)
 
 # Base directory and file paths
 base_dir = r"C:\Users\NVN\Master_Thesis\github_repo"
