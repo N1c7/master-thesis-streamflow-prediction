@@ -21,6 +21,7 @@ setup(
         'tensorflow==2.9.0',
         'keras-tuner==1.4.7',
         'scikit-optimize==0.10.2',
+        'protobuf<3.20,>=3.9.2',
         
         # Utilities
         'joblib==1.4.2',
