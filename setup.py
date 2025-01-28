@@ -1,9 +1,5 @@
 from setuptools import setup, find_packages
 
-# Read requirements.txt
-with open('requirements.txt') as f:
-    requirements = f.read().splitlines()
-
 setup(
     name="seasonal_streamflow_prediction",
     version="1.0",
@@ -22,7 +18,7 @@ setup(
         
         # Machine Learning packages
         'scikit-learn>=0.23.0',
-        'tensorflow>=2.0.0',
+        'tensorflow==2.12.0',
         'keras-tuner>=1.1.0',
         'scikit-optimize>=0.8.1',
         
@@ -32,5 +28,5 @@ setup(
         # Visualization
         'matplotlib>=3.2.0',
     ],
-    python_requires='>=3.8'
+    python_requires='>=3.8,<3.9'
 )

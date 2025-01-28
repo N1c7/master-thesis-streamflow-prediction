@@ -22,6 +22,6 @@ def get_models_dir():
 
 # Export everything
 __all__ = [
-    'dependencies', 'utils', 'vis', 'Models', 'Plots', 'Preprocessing',
+    'dependencies', 'utils', 'vis', 'Model_trianing', 'Plotting', 'Preprocessing',
     'get_project_root', 'get_code_dir', 'get_data_dir', 'get_models_dir'
 ]
