@@ -35,9 +35,6 @@ output_scaler = StandardScaler()
 output_feature = output_scaler.fit_transform(output_feature.values.reshape(-1, 1)).flatten()
 output_feature_smooth = output_feature
 
-# Split the data into training and test sets (80% train, 20% test)
-X_train, X_test, y_train, y_test = train_test_split(input_features, output_feature_smooth, test_size=0.2, random_state=42)
-
 # Define the ELM model
 class ELM:
     def __init__(self, input_size, hidden_size):
@@ -60,7 +57,7 @@ class ELM:
         return predictions
 
 # Function to evaluate the model
-def evaluate_model(hidden_size):
+def evaluate_model(hidden_size, X_train, y_train, X_test, y_test):
     elm = ELM(input_size=X_train.shape[1], hidden_size=hidden_size)
     elm.fit(X_train, y_train)
     y_pred = elm.predict(X_test)
@@ -72,29 +69,39 @@ def evaluate_model(hidden_size):
     nse = 1 - (np.sum((y_test_denorm - y_pred_denorm) ** 2) / np.sum((y_test_denorm - np.mean(y_test_denorm)) ** 2))
     return rmse, nse
 
-# Grid search for hidden size
+# TimeSeriesSplit for cross-validation
+tscv = TimeSeriesSplit(n_splits=3)
 hidden_sizes = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 25, 40, 50, 100, 200, 300, 400, 500]
 best_rmse = float('inf')
 best_nse = float('-inf')
 best_hidden_size = None
 
 for hidden_size in hidden_sizes:
-    rmse, nse = evaluate_model(hidden_size)
-    print(f"Hidden Size: {hidden_size}, RMSE: {rmse}, NSE: {nse}")
-    if rmse < best_rmse:
-        best_rmse = rmse
-        best_nse = nse
+    rmses = []
+    nses = []
+    for train_index, test_index in tscv.split(input_features):
+        X_train, X_test = input_features[train_index], input_features[test_index]
+        y_train, y_test = output_feature_smooth[train_index], output_feature_smooth[test_index]
+        rmse, nse = evaluate_model(hidden_size, X_train, y_train, X_test, y_test)
+        rmses.append(rmse)
+        nses.append(nse)
+    avg_rmse = np.mean(rmses)
+    avg_nse = np.mean(nses)
+    print(f"Hidden Size: {hidden_size}, RMSE: {avg_rmse}, NSE: {avg_nse}")
+    if avg_rmse < best_rmse:
+        best_rmse = avg_rmse
+        best_nse = avg_nse
         best_hidden_size = hidden_size
 
 print(f"Best Hidden Size: {best_hidden_size}, Best RMSE: {best_rmse}, Best NSE: {best_nse}")
 
-# Train the best model
-elm = ELM(input_size=X_train.shape[1], hidden_size=best_hidden_size)
-elm.fit(X_train, y_train)
-y_pred = elm.predict(X_test)
+# Train the best model on the entire training data
+elm = ELM(input_size=input_features.shape[1], hidden_size=best_hidden_size)
+elm.fit(input_features, output_feature_smooth)
+y_pred = elm.predict(input_features)
 
 # Denormalize the predicted values and the actual values
-y_test_denorm = output_scaler.inverse_transform(y_test.reshape(-1, 1)).flatten()
+y_test_denorm = output_scaler.inverse_transform(output_feature_smooth.reshape(-1, 1)).flatten()
 y_pred_denorm = output_scaler.inverse_transform(y_pred.reshape(-1, 1)).flatten()
 y_test_denorm = np.maximum(y_test_denorm, 0)  # Cap actual values at 0 after denormalizing
 y_pred_denorm = np.maximum(y_pred_denorm, 0)  # Cap predictions at 0 after denormalizing

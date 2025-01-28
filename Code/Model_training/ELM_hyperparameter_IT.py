@@ -12,7 +12,8 @@ from dependencies import (
     # Sklearn components
     train_test_split,
     StandardScaler,
-    mean_squared_error
+    mean_squared_error,
+    TimeSeriesSplit
 )
 input_file_path = os.path.join(get_data_dir(), 'Secchia', 'Preprocessed_data_IT.nc')
 ds = xr.open_dataset(input_file_path)
