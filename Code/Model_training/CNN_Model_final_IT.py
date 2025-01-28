@@ -1,71 +1,126 @@
-from dependencies import (
-   # Core data science libraries
-   np,
-   os,
-   joblib,
-   pd,
-   plt,
-   xr,
-   tf,
-   
-   # Sklearn components
-   TimeSeriesSplit,
-   StandardScaler,
-   mean_squared_error,
-   mean_absolute_error,
-   r2_score,
-   
-   # Keras/TensorFlow components
-   Sequential,
-   Model,
-   LSTM,
-   Dense,
-   Dropout,
-   InputLayer,
-   Adam,
-   MeanSquaredError,
-   RootMeanSquaredError,
-   
-   # Local utility functions
-   preprocessing_data,
-   prepare_direct_data,
-   prepare_forecast_data,
-   calculate_weights,
-   calculate_metrics
-)
+import os
+from project_paths import get_code_dir, get_data_dir, get_models_dir
 
-new_working_directory = r"C:\Users\NVN\Master_Thesis\Preprocessed_data\Final_Model_Codes"
-os.chdir(new_working_directory)
+from dependencies import (
+    # System and core libraries
+    os,
+    np,
+    plt,
+    
+    # TensorFlow and Keras components
+    tf,
+    Sequential,
+    Model,
+    
+    # Keras layers
+    Conv1D,
+    MaxPooling1D,
+    Flatten,
+    Dense,
+    Dropout,
+    BatchNormalization,
+    ReLU,
+    Input,
+    Concatenate,
+    GlobalAveragePooling1D,
+    
+    # Keras callbacks
+    ModelCheckpoint,
+    EarlyStopping,
+
+    # Local utility functions
+    preprocessing_data,
+    prepare_direct_data,
+    prepare_forecast_data, 
+    calculate_weights,
+    calculate_metrics
+)
 
 np.random.seed(123)
 tf.random.set_seed(123)
 
 # Define file paths and model save directory
-input_file_path = r"C:\Users\NVN\Master_Thesis\Preprocessed_data\Secchia\Preprocessed_data_IT.nc"
-model_save_dir = r"C:\Users\NVN\Master_Thesis\Models\Secchia\LSTM"
+input_file_path = os.path.join(get_data_dir(), 'Secchia', 'Preprocessed_data_IT.nc')
+script_dir = os.path.dirname(os.path.abspath(__file__))
+os.chdir(script_dir)
+model_save_dir = os.path.join(script_dir, 'Models', 'Secchia', 'CNN')
 
 # Prepare data
 X_train, y_train, X_val, y_val, X_test, y_test, ds, output_scaler = preprocessing_data(input_file_path, model_save_dir)
 
-# Build model function (modified to specify input shape)
-def build_lstm_model(input_shape, units1=96, units2=28, dropout_rate=0.1911352580410303, learning_rate=0.0009638148225639677):
-    model = Sequential([
-        InputLayer(input_shape=input_shape),
-        LSTM(units=units1, activation='tanh', return_sequences=True),
-        Dropout(dropout_rate),
-        LSTM(units=units2, activation='tanh'),
-        Dropout(dropout_rate),
-        Dense(units=1, activation='linear')
-    ])
-    model.compile(loss=MeanSquaredError(), optimizer=Adam(learning_rate=learning_rate), metrics=[RootMeanSquaredError()])
+# Define the CNN model with parallel convolution branches using different kernel sizes
+def create_parallel_cnn_model(input_shape, 
+                            filters1=128, 
+                            filters2=32, 
+                            filters3=128, 
+                            kernel_sizes=[3, 3, 7], 
+                            dense_units1=256, 
+                            dense_units2=192,
+                            dropout_rate=0.2):
+    """
+    Creates a CNN model with parallel convolution branches using different kernel sizes
+    """
+    # Input layer
+    inputs = Input(shape=input_shape)
+    
+    # Parallel convolution branches
+    conv_outputs = []
+    for kernel_size in kernel_sizes:
+        # First Conv block
+        conv = Conv1D(filters=filters1, 
+                     kernel_size=kernel_size, 
+                     padding='same')(inputs)
+        conv = BatchNormalization()(conv)
+        conv = ReLU()(conv)
+        
+        # Second Conv block
+        conv = Conv1D(filters=filters2,
+                     kernel_size=kernel_size,
+                     padding='same')(conv)
+        conv = BatchNormalization()(conv)
+        conv = ReLU()(conv)
+        conv = Dropout(dropout_rate)(conv)
+        
+        # Third Conv block
+        conv = Conv1D(filters=filters3,
+                     kernel_size=kernel_size,
+                     padding='same')(conv)
+        conv = BatchNormalization()(conv)
+        conv = ReLU()(conv)
+        
+        conv_outputs.append(conv)
+    
+    # Combine parallel branches
+    if len(kernel_sizes) > 1:
+        x = Concatenate()(conv_outputs)
+    else:
+        x = conv_outputs[0]
+    
+    # Global pooling instead of MaxPooling
+    x = GlobalAveragePooling1D()(x)
+    
+    # Dense layers
+    x = Dense(dense_units1, activation='relu')(x)
+    x = Dropout(dropout_rate)(x)
+    x = Dense(dense_units2, activation='relu')(x)
+    x = Dropout(dropout_rate)(x)
+    outputs = Dense(1, activation='linear')(x)
+    
+    model = Model(inputs=inputs, outputs=outputs)
+    model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
+                 loss='mean_squared_error',
+                 metrics=['mae'])
+    
     return model
 
 # Define forecast horizons to test
 forecast_horizons = [1, 2, 4, 12, 24]
 all_results = {}
 
-for forecast_horizon in forecast_horizons:
-    print(f"\nProcessing forecast horizon: {forecast_horizon}")
+for idx, forecast_horizon in enumerate(forecast_horizons, 1):
+    print(f"\n{'='*50}")
+    print(f"Processing forecast horizon: {forecast_horizon}")
+    print(f"{'='*50}")
     
     try:
         # Prepare data for both approaches
@@ -79,7 +134,7 @@ for forecast_horizon in forecast_horizons:
         X_forecast_val, y_forecast_val = prepare_forecast_data(X_val, y_val, forecast_horizon, ds)
         X_forecast_test, y_forecast_test = prepare_forecast_data(X_test, y_test, forecast_horizon, ds)
 
-        # Reshape data for LSTM
+        # Reshape data for Conv1D
         print("Reshaping data...")
         X_direct_train = X_direct_train.reshape((X_direct_train.shape[0], X_direct_train.shape[1], X_direct_train.shape[2]))
         X_direct_val = X_direct_val.reshape((X_direct_val.shape[0], X_direct_val.shape[1], X_direct_val.shape[2]))
@@ -95,14 +150,14 @@ for forecast_horizon in forecast_horizons:
         input_shape_forecast = (X_forecast_train.shape[1], X_forecast_train.shape[2])
 
         # Initialize models
-        direct_model = build_lstm_model(input_shape=input_shape_direct)
-        forecast_model = build_lstm_model(input_shape=input_shape_forecast)
+        direct_model = create_parallel_cnn_model(input_shape=input_shape_direct)
+        forecast_model = create_parallel_cnn_model(input_shape=input_shape_forecast)
 
         # Callbacks
         callbacks = [
             tf.keras.callbacks.EarlyStopping(
                 monitor='val_loss',
-                patience=10,
+                patience=15,
                 restore_best_weights=True,
                 mode='min'
             ),
@@ -116,24 +171,30 @@ for forecast_horizon in forecast_horizons:
 
         # Train models
         print("Training direct model...")
-        direct_model.fit(
+        history_direct = direct_model.fit(
             X_direct_train, y_direct_train,
             validation_data=(X_direct_val, y_direct_val),
-            epochs=46,
-            batch_size=20,
+            epochs=100,
+            batch_size=32,
             callbacks=callbacks,
             verbose=1
         )
 
         print("Training forecast model...")
-        forecast_model.fit(
+        history_forecast = forecast_model.fit(
             X_forecast_train, y_forecast_train,
             validation_data=(X_forecast_val, y_forecast_val),
-            epochs=46,
-            batch_size=20,
+            epochs=100,
+            batch_size=32,
             callbacks=callbacks,
             verbose=1
         )
+
+        # Save models
+        direct_model_path = os.path.join(model_save_dir, f'direct_cnn_model_FH{forecast_horizon}.h5')
+        forecast_model_path = os.path.join(model_save_dir, f'forecast_cnn_model_FH{forecast_horizon}.h5')
+        direct_model.save(direct_model_path)
+        forecast_model.save(forecast_model_path)
 
         # Generate predictions
         print("Generating predictions...")
@@ -143,23 +204,6 @@ for forecast_horizon in forecast_horizons:
         # Calculate weights and combine predictions
         direct_weight, forecast_weight = calculate_weights(forecast_horizon)
         y_pred_combined = (direct_weight * y_pred_direct + forecast_weight * y_pred_forecast)
-
-        # Save models and weights
-        direct_model_path = os.path.join(model_save_dir, f'direct_lstm_model_FH{forecast_horizon}.h5')
-        forecast_model_path = os.path.join(model_save_dir, f'forecast_lstm_model_FH{forecast_horizon}.h5')
-        weights_path = os.path.join(model_save_dir, f'combined_weights_FH{forecast_horizon}.joblib')
-
-        # Save the models
-        direct_model.save(direct_model_path)
-        forecast_model.save(forecast_model_path)
-
-        # Save the weights
-        weights_dict = {
-            'direct_weight': direct_weight,
-         'forecast_weight': forecast_weight
-        }
-        joblib.dump(weights_dict, weights_path)
-
 
         # Denormalize predictions
         y_test_denorm = output_scaler.inverse_transform(y_direct_test.reshape(-1, 1)).flatten()
@@ -178,7 +222,6 @@ for forecast_horizon in forecast_horizons:
         metrics_direct = calculate_metrics(y_test_denorm, y_pred_direct_denorm, f"Direct Forecasting (h={forecast_horizon})")
         metrics_forecast = calculate_metrics(y_test_denorm, y_pred_forecast_denorm, f"Forecast-based (h={forecast_horizon})")
         metrics_combined = calculate_metrics(y_test_denorm, y_pred_combined_denorm, f"Combined Approach (h={forecast_horizon})")
-
 
         # Store results
         all_results[forecast_horizon] = {

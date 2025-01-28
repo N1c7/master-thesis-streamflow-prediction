@@ -13,7 +13,6 @@ Output:
 The combined dataset is saved as a NetCDF file.
 
 """
-
 from dependencies import (
     # Core data science libraries
     os,
@@ -30,13 +29,15 @@ from dependencies import (
     plt
 )
 
-# Base directory and file paths
-base_dir = r"C:\Users\NVN\Master_Thesis\github_repo"
-t2m_path = os.path.join(base_dir, "Data/Iori/Hourly_t2m_reanalysis_data_GE.nc")
-tp_path = os.path.join(base_dir, "Data/Iori/Hourly_tp_reanalysis_data_GE.nc")
-forecast_path = os.path.join(base_dir, "Data/Iori/Monthly_Forecast_GE.nc")
-shapefile_path = os.path.join(base_dir, "Data/Iori/Upstream_basin_Iori.shp")
-discharge_path = os.path.join(base_dir, "Data/Iori/Discharge_GE.nc")
+script_dir = os.path.dirname(os.path.abspath(__file__))
+os.chdir(script_dir)
+
+base_dir = os.path.join(script_dir, "Data", "Iori")
+t2m_path = os.path.join(base_dir, "Hourly_t2m_reanalysis_data_GE.nc")
+tp_path = os.path.join(base_dir, "Hourly_tp_reanalysis_data_GE.nc")
+forecast_path = os.path.join(base_dir, "Monthly_Forecast_GE.nc")
+shapefile_path = os.path.join(base_dir, "Upstream_basin_Iori.shp")
+discharge_path = os.path.join(base_dir, "Discharge_GE.nc")
 
 # Load datasets
 t2m_ds = xr.open_dataset(t2m_path)
@@ -186,8 +187,9 @@ combined_ds = combined_ds.drop_vars('number').rename({'forecastMonth': 'lead_tim
 
 
 # Save the combined dataset to a NetCDF file
-output_path = os.path.join(r"C:\Users\NVN\Master_Thesis\Preprocessed_data\Iori\Preprocessed_data_GE.nc")
+output_path = os.path.join(script_dir, 'Preprocessed_data_GE.nc')
 combined_ds.to_netcdf(output_path)
+
 
 print(f"Combined dataset saved to NetCDF file at {output_path}.")
 

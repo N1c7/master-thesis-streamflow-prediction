@@ -30,13 +30,16 @@ from dependencies import (
     plt
 )
 
-# Base directory and file paths
-base_dir = r"C:\Users\NVN\Master_Thesis\github_repo"
-t2m_path = os.path.join(base_dir, "Data/Secchia/Hourly_t2m_reanalysis_data_IT.nc")
-tp_path = os.path.join(base_dir, "Data/Secchia/Hourly_tp_reanalysis_data_IT.nc")
-forecast_path = os.path.join(base_dir, "Data/Secchia/Monthly_Forecast_IT.nc")
-shapefile_path = os.path.join(base_dir, "Data/Secchia/Upstream_basin_Secchia.shp")
-discharge_path = os.path.join(base_dir, "Data/Secchia/Discharge_IT.nc")
+script_dir = os.path.dirname(os.path.abspath(__file__))
+os.chdir(script_dir)
+
+base_dir = os.path.join(script_dir, "Data", "Secchia")
+t2m_path = os.path.join(base_dir, "Hourly_t2m_reanalysis_data_IT.nc")
+tp_path = os.path.join(base_dir, "Hourly_tp_reanalysis_data_IT.nc")
+forecast_path = os.path.join(base_dir, "Monthly_Forecast_IT.nc")
+shapefile_path = os.path.join(base_dir, "Upstream_basin_Secchia.shp")
+discharge_path = os.path.join(base_dir, "Discharge_IT.nc")
+
 
 # Load datasets
 t2m_ds = xr.open_dataset(t2m_path)
@@ -257,7 +260,8 @@ combined_ds = xr.Dataset({
 
 combined_ds
 # Save the combined dataset to a NetCDF file
-output_path = os.path.join(r"C:\Users\NVN\Master_Thesis\Preprocessed_data\Secchia\Preprocessed_data_IT.nc")
+output_path = os.path.join(script_dir, 'Preprocessed_data_IT.nc')
+
 combined_ds.to_netcdf(output_path)
 
 print(f"Combined dataset saved to NetCDF file at {output_path}.")

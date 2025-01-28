@@ -56,7 +56,7 @@ from skopt import gp_minimize
 from skopt.space import Real, Integer, Categorical
 
 # Local imports
-from utils import (
+from .utils import (
     nash_sutcliffe_efficiency,
     calculate_metrics,
     prepare_forecast_data,
@@ -64,7 +64,7 @@ from utils import (
     preprocessing_data,
     calculate_weights
 )
-from vis import (
+from .vis import (
     load_data,
     load_model_file,
     get_combined_predictions,
@@ -75,7 +75,8 @@ from vis import (
 )
 
 # Constants and configurations
-WORKING_DIRECTORY = r"C:\Users\NVN\Master_Thesis\Preprocessed_data\Final_Model_Codes"
+from project_paths import get_project_root
+WORKING_DIRECTORY = get_project_root()
 
 # Create a dictionary of all imports to be made available
 __exports__ = {

@@ -1,3 +1,6 @@
+import os
+from project_paths import get_code_dir, get_data_dir, get_models_dir
+
 from dependencies import (
     # Core data science libraries
     np,
@@ -23,16 +26,15 @@ from dependencies import (
     calculate_weights,
     calculate_metrics
 )
-new_working_directory = r"C:\Users\NVN\Master_Thesis\Preprocessed_data\Final_Model_Codes"
-os.chdir(new_working_directory)
-
 
 np.random.seed(123)
 tf.random.set_seed(123)
 
 # Define file paths and model save directory
-input_file_path = r"C:\Users\NVN\Master_Thesis\Preprocessed_data\Secchia\Preprocessed_data_IT.nc"
-model_save_dir = r"C:\Users\NVN\Master_Thesis\Models\Secchia\ELM"
+input_file_path = os.path.join(get_data_dir(), 'Secchia', 'Preprocessed_data_IT.nc')
+script_dir = os.path.dirname(os.path.abspath(__file__))
+os.chdir(script_dir)
+model_save_dir = os.path.join(script_dir, 'Models', 'Secchia', 'ELM')
 
 # Prepare data
 X_train, y_train, X_val, y_val, X_test, y_test, ds, output_scaler = preprocessing_data(input_file_path, model_save_dir)

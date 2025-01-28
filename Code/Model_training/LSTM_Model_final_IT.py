@@ -1,3 +1,6 @@
+import os
+from project_paths import get_code_dir, get_data_dir, get_models_dir
+
 from dependencies import (
    # Core data science libraries
    np,
@@ -34,21 +37,20 @@ from dependencies import (
    calculate_metrics
 )
 
-new_working_directory = r"C:\Users\NVN\Master_Thesis\Preprocessed_data\Final_Model_Codes"
-os.chdir(new_working_directory)
-
 np.random.seed(123)
 tf.random.set_seed(123)
 
 # Define file paths and model save directory
-input_file_path = r"C:\Users\NVN\Master_Thesis\Preprocessed_data\Iori\Preprocessed_data_GE.nc"
-model_save_dir = r"C:\Users\NVN\Master_Thesis\Models\Iori\LSTM"
+input_file_path = os.path.join(get_data_dir(), 'Secchia', 'Preprocessed_data_IT.nc')
+script_dir = os.path.dirname(os.path.abspath(__file__))
+os.chdir(script_dir)
+model_save_dir = os.path.join(script_dir, 'Models', 'Secchia', 'LSTM')
 
 # Prepare data
 X_train, y_train, X_val, y_val, X_test, y_test, ds, output_scaler = preprocessing_data(input_file_path, model_save_dir)
 
 # Build model function (modified to specify input shape)
-def build_lstm_model(input_shape, units1=75, units2=130, dropout_rate=0.25315, learning_rate=0.000456):
+def build_lstm_model(input_shape, units1=96, units2=28, dropout_rate=0.1911352580410303, learning_rate=0.0009638148225639677):
     model = Sequential([
         InputLayer(input_shape=input_shape),
         LSTM(units=units1, activation='tanh', return_sequences=True),
@@ -119,8 +121,8 @@ for forecast_horizon in forecast_horizons:
         direct_model.fit(
             X_direct_train, y_direct_train,
             validation_data=(X_direct_val, y_direct_val),
-            epochs=71,
-            batch_size=8,
+            epochs=46,
+            batch_size=20,
             callbacks=callbacks,
             verbose=1
         )
@@ -129,17 +131,11 @@ for forecast_horizon in forecast_horizons:
         forecast_model.fit(
             X_forecast_train, y_forecast_train,
             validation_data=(X_forecast_val, y_forecast_val),
-            epochs=71,
-            batch_size=8,
+            epochs=46,
+            batch_size=20,
             callbacks=callbacks,
             verbose=1
         )
-
-        # Save models
-        direct_model_path = os.path.join(model_save_dir, f'direct_lstm_model_FH{forecast_horizon}.h5')
-        forecast_model_path = os.path.join(model_save_dir, f'forecast_lstm_model_FH{forecast_horizon}.h5')
-        direct_model.save(direct_model_path)
-        forecast_model.save(forecast_model_path)
 
         # Generate predictions
         print("Generating predictions...")
@@ -149,6 +145,23 @@ for forecast_horizon in forecast_horizons:
         # Calculate weights and combine predictions
         direct_weight, forecast_weight = calculate_weights(forecast_horizon)
         y_pred_combined = (direct_weight * y_pred_direct + forecast_weight * y_pred_forecast)
+
+        # Save models and weights
+        direct_model_path = os.path.join(model_save_dir, f'direct_lstm_model_FH{forecast_horizon}.h5')
+        forecast_model_path = os.path.join(model_save_dir, f'forecast_lstm_model_FH{forecast_horizon}.h5')
+        weights_path = os.path.join(model_save_dir, f'combined_weights_FH{forecast_horizon}.joblib')
+
+        # Save the models
+        direct_model.save(direct_model_path)
+        forecast_model.save(forecast_model_path)
+
+        # Save the weights
+        weights_dict = {
+            'direct_weight': direct_weight,
+         'forecast_weight': forecast_weight
+        }
+        joblib.dump(weights_dict, weights_path)
+
 
         # Denormalize predictions
         y_test_denorm = output_scaler.inverse_transform(y_direct_test.reshape(-1, 1)).flatten()
@@ -167,6 +180,7 @@ for forecast_horizon in forecast_horizons:
         metrics_direct = calculate_metrics(y_test_denorm, y_pred_direct_denorm, f"Direct Forecasting (h={forecast_horizon})")
         metrics_forecast = calculate_metrics(y_test_denorm, y_pred_forecast_denorm, f"Forecast-based (h={forecast_horizon})")
         metrics_combined = calculate_metrics(y_test_denorm, y_pred_combined_denorm, f"Combined Approach (h={forecast_horizon})")
+
 
         # Store results
         all_results[forecast_horizon] = {

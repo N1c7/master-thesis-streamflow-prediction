@@ -1,30 +1,26 @@
-from dependencies import (
-   # Core data science libraries
-   os,
-   np,
-   xr,
-   joblib,
-   plt,
-   
-   # Keras/TensorFlow components
-   load_model,
-   
-   # Statistical functions
-   pearsonr,
-   skew,
-   kurtosis,
-   mae,          # mean_absolute_error alias
-   sklearn_mse,  # mean_squared_error alias
-   
-   # Matplotlib date utilities
-   YearLocator,
-   DateFormatter,
-   AutoDateLocator,
-   
-   # Local utility functions
-   prepare_direct_data,
-   prepare_forecast_data,
-   calculate_metrics
+# Core data science libraries
+import os
+import numpy as np
+import xarray as xr
+import joblib
+import matplotlib.pyplot as plt
+
+# Keras/TensorFlow components
+from tensorflow.keras.models import load_model
+
+# Statistical functions
+from scipy.stats import pearsonr, skew, kurtosis
+from sklearn.metrics import mean_squared_error as sklearn_mse
+from sklearn.metrics import mean_absolute_error as mae
+
+# Matplotlib date utilities
+from matplotlib.dates import YearLocator, DateFormatter, AutoDateLocator
+
+# Local utility functions 
+from .utils import (
+    prepare_direct_data,
+    prepare_forecast_data,
+    calculate_metrics
 )
 
 class ELM:

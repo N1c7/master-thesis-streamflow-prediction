@@ -1,6 +1,7 @@
 __all__ = ['ELM', 'plot_combined_model']
 
-from dependencies import (
+from project_paths import get_models_dir
+from Code.dependencies import (
    # Core data science libraries
    os,
    np,
@@ -62,17 +63,16 @@ class ELM:
 np.random.seed(123)
 tf.random.set_seed(123)
 
-# Define directories
 model_dirs = {
-    'Iori_CNN': r"C:\Users\NVN\Master_Thesis\Models\Iori\CNN",
-    'Iori_LSTM': r"C:\Users\NVN\Master_Thesis\Models\Iori\LSTM",
-    'Iori_ELM': r"C:\Users\NVN\Master_Thesis\Models\Iori\ELM",
-    'Secchia_CNN': r"C:\Users\NVN\Master_Thesis\Models\Secchia\CNN",
-    'Secchia_LSTM': r"C:\Users\NVN\Master_Thesis\Models\Secchia\LSTM",
-    'Secchia_ELM': r"C:\Users\NVN\Master_Thesis\Models\Secchia\ELM"
+    'Iori_CNN': os.path.join(get_models_dir(), 'Iori', 'CNN'),
+    'Iori_LSTM': os.path.join(get_models_dir(), 'Iori', 'LSTM'),
+    'Iori_ELM': os.path.join(get_models_dir(), 'Iori', 'ELM'),
+    'Secchia_CNN': os.path.join(get_models_dir(), 'Secchia', 'CNN'),
+    'Secchia_LSTM': os.path.join(get_models_dir(), 'Secchia', 'LSTM'),
+    'Secchia_ELM': os.path.join(get_models_dir(), 'Secchia', 'ELM')
 }
 
-weights_dir = r"C:\Users\NVN\Master_Thesis\Models\Weights"
+weights_dir = os.path.join(get_models_dir(), 'Weights')
 forecast_horizons = [1, 2, 4, 12, 24]
 
 #################  Plot for all Hydrographs (single) #######################

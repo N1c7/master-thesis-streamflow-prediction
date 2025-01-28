@@ -1,4 +1,7 @@
-from dependencies import (
+import os
+from project_paths import get_code_dir, get_data_dir, get_models_dir
+
+from Code.dependencies import (
     # Data handling and visualization
     np,
     pd,
@@ -27,8 +30,7 @@ from dependencies import (
     joblib
 )
 
-# Load the data into an xarray Dataset
-input_file_path = r"C:\Users\NVN\Master_Thesis\Preprocessed_data\Iori\Preprocessed_data_GE.nc"
+input_file_path = os.path.join(get_data_dir(), 'Iori', 'Preprocessed_data_GE.nc')
 ds = xr.open_dataset(input_file_path)
 
 # Select input features and output feature

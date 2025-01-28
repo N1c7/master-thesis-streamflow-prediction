@@ -1,21 +1,14 @@
+import os
+import numpy as np
+import xarray as xr
+import pandas as pd
+import joblib
+from sklearn.metrics import mean_squared_error as sklearn_mse
+from sklearn.metrics import mean_absolute_error as mae
+from scipy.stats import pearsonr
+from sklearn.model_selection import TimeSeriesSplit
+from sklearn.preprocessing import StandardScaler
 
-from dependencies import (
-    # Core data science libraries
-    os,
-    np,
-    xr,
-    pd,
-    joblib,
-    
-    # Statistical metrics and functions
-    sklearn_mse,  # mean_squared_error alias
-    mae,          # mean_absolute_error alias
-    pearsonr,
-    
-    # Sklearn components
-    TimeSeriesSplit,
-    StandardScaler
-)
 
 def add_lagged_features_split(df, target_column, lags):
     lagged_df = df.copy()

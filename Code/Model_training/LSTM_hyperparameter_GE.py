@@ -1,3 +1,6 @@
+import os
+from project_paths import get_code_dir, get_data_dir, get_models_dir
+
 from dependencies import (
    # Core data science libraries
    tf,
@@ -28,8 +31,7 @@ from dependencies import (
    mean_squared_error
 )
 
-# Load the data into an xarray Dataset
-input_file_path = r"C:\Users\NVN\Master_Thesis\Preprocessed_data\Secchia\Preprocessed_data_IT.nc"
+input_file_path = os.path.join(get_data_dir(), 'Iori', 'Preprocessed_data_GE.nc')
 ds = xr.open_dataset(input_file_path)
 
 # Select input features and output feature
@@ -78,8 +80,8 @@ def build_model(units1, units2, activation, learning_rate, dropout_rate):
 search_space = [
     Integer(low=10, high=150, name='units1'),
     Integer(low=10, high=150, name='units2'),
-    Categorical(categories=['relu', 'tanh', 'sigmoid', 'elu'], name='activation'),
-    Real(low=1e-5, high=1e-3, name='learning_rate'),
+    Categorical(categories=['relu', 'tanh'], name='activation'),
+    Real(low=1e-5, high=1e-3, name='learning_rate'), 
     Integer(low=8, high=32, name='batch_size'),
     Integer(low=10, high=75, name='epochs'),
     Real(low=0.1, high=0.5, name='dropout_rate')
@@ -199,7 +201,7 @@ print(f"Train NSE: {train_nse}")
 print(f"Validation NSE: {val_nse}")
 print(f"Test NSE: {test_nse}")
 
-# Plot the Results
+# Plot the results
 plt.figure(figsize=(10, 6))
 plt.plot(test_results['Test Predictions'][:100], label='Test Predictions')
 plt.plot(test_results['Actuals'][:100], label='Actuals')

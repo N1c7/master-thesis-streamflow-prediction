@@ -10,6 +10,7 @@ setup(
     description="Seasonal Streamflow Prediction With Data-Driven Models",
     author="Nick van Nuland", 
     packages=find_packages(),
+    py_modules=['project_paths'],
     install_requires=[
         # Core data science packages
         'numpy>=1.19.0',
