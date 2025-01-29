@@ -17,11 +17,14 @@ from sklearn.metrics import mean_absolute_error as mae
 from matplotlib.dates import YearLocator, DateFormatter, AutoDateLocator
 
 # Local utility functions 
-from .utils import (
+from Code.utils import (
     prepare_direct_data,
     prepare_forecast_data,
     calculate_metrics
 )
+
+# Import path utilities
+from project_paths import get_data_dir
 
 class ELM:
     def __init__(self, input_size, hidden_size):
@@ -51,11 +54,13 @@ def load_data(model_dir):
     output_scaler = joblib.load(os.path.join(model_dir, 'output_scaler.pkl'))
     test_dates = np.load(os.path.join(model_dir, 'test_dates.npy'), allow_pickle=True)
     
-    # Load the original dataset
+    # Load the original dataset using relative paths
     if 'Iori' in model_dir:
-        ds = xr.open_dataset(r"C:\Users\NVN\Master_Thesis\Preprocessed_data\Iori\Preprocessed_data_GE.nc")
+        input_file_path = os.path.join(get_data_dir(), 'Iori', 'Preprocessed_data_GE.nc')
     else:  # Secchia
-        ds = xr.open_dataset(r"C:\Users\NVN\Master_Thesis\Preprocessed_data\Secchia\Preprocessed_data_IT.nc")
+        input_file_path = os.path.join(get_data_dir(), 'Secchia', 'Preprocessed_data_IT.nc')
+    
+    ds = xr.open_dataset(input_file_path)
     
     return X_test, y_test, output_scaler, test_dates, ds
 
