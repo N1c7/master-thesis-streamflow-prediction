@@ -16,7 +16,8 @@ setup(
         'geopandas==0.13.2',
         'shapely==2.0.6',
         'netCDF4==1.6.3',
-        'h5py==3.8.0',  
+        'h5py==3.8.0',
+        'Fiona==1.9.6', 
         
         # Machine Learning packages
         'scikit-learn==1.3.2',
